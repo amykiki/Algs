@@ -41,6 +41,9 @@ public class Deque<Item> implements Iterable<Item> {
     }
     
     public void addLast(Item item) {
+        if (item == null) {
+            throw new java.lang.NullPointerException("the add item is NULL");
+        }
         Node oldLast = last;
         last = new Node();
         last.item = item;
@@ -78,7 +81,7 @@ public class Deque<Item> implements Iterable<Item> {
             throw e;
         }
         return item;
-    }  
+    }
     public Item removeLast() {
         Item item = null;
         try {
@@ -103,17 +106,21 @@ public class Deque<Item> implements Iterable<Item> {
         }
         return item;
     }
+    @Override
     public Iterator<Item> iterator() {
         return new DequeIterator();
     }
     private class DequeIterator implements Iterator<Item> {
         private Node current = first;
+        @Override
         public void remove() {
             throw new java.lang.UnsupportedOperationException();
         }
+        @Override
         public boolean hasNext() {
             return current != null;
         }
+        @Override
         public Item next() {
             Item item = null;
             try {
@@ -148,7 +155,7 @@ public class Deque<Item> implements Iterable<Item> {
         d.addLast(9);
         d.addLast(8);
         Iterator<Integer> it = d.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             StdOut.print(it.next() + " ");
         }
         StdOut.println();
