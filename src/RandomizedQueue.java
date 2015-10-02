@@ -1,5 +1,5 @@
 import java.util.Iterator;
-
+import edu.princeton.cs.algs4.*;
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private int N;
     private Item[] a = (Item []) new Object[1];

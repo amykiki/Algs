@@ -1,5 +1,5 @@
 import java.util.Arrays;
-
+import edu.princeton.cs.algs4.*;
 public class Brute {
     public static void main(String[] args) {
         String file = args[0];

@@ -1,4 +1,4 @@
-
+import edu.princeton.cs.algs4.*;
 public class Percolation {
     private int[][] data;
     private int pNUM;

@@ -1,6 +1,6 @@
 import java.awt.Color;
 import java.util.Arrays;
-
+import edu.princeton.cs.algs4.*;
 public class PercolationForTest {
     private int[][] data;
     private int[][] size;

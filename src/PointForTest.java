@@ -1,5 +1,5 @@
 import java.util.Comparator;
-
+import edu.princeton.cs.algs4.*;
 public class PointForTest implements Comparable<PointForTest> {
     public final Comparator<PointForTest> SLOPE_ORDER = new BySlope();
     

@@ -5,6 +5,7 @@
  * <p>
  * @author Amy
  */
+import edu.princeton.cs.algs4.*;
 public class PercolationStats {
     private int N = 0;              // N*N grid
     private int T = 0;               // repeat time
