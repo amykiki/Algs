@@ -54,6 +54,23 @@ public class Board {
         curZero = null;
         lastZero = null;
     }
+    public boolean equals(Object y) {
+        if (y == null) return false;
+        if (this == y) return true;
+        if (this.getClass() != y.getClass()) return false;
+        Board other = (Board) y;
+        if (this.dimension != other.dimension) return false;
+        boolean result = true;
+        for (int i = 0; i < dimension && result; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (this.blocks[i][j] != other.blocks[i][j]) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
     public int dimension() {
         return dimension;
     }
