@@ -1,5 +1,3 @@
-package eightPuzzel;
-
 import java.util.ArrayList;
 import java.util.Random;
 
