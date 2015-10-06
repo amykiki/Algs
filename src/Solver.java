@@ -88,9 +88,6 @@ public class Solver {
         return solutions;
     }
     public static void main(String[] args) {
-//        String dataFile = args[0];
-//        dataFile = System.getProperty("user.dir") + "/" + dataFile;
-//        In in = new In(dataFile);
         In in = new In(args[0]);
         int N = in.readInt();
         int[][] blocks = new int[N][N];
@@ -100,6 +97,7 @@ public class Solver {
             }
         }
         Board initial = new Board(blocks);
+        StdOut.println(initial.toString());
         Solver solver = new Solver(initial);
         if (!solver.isSolvable())
             StdOut.println("No solution possible");

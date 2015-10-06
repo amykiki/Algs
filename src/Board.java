@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.StdOut;
-
 public class Board {
     private class Node {
         private int x;
@@ -44,9 +41,11 @@ public class Board {
     private int curMan;
     private Node curZero;
     private Node lastZero;
+    private int printLength;
     public Board(int[][] blocks) {
         int N = blocks.length;
         dimension = N;
+        printLength = String.valueOf(dimension*dimension - 1).length() + 2;
         this.blocks = new int[N][N];
         copyArrs(this.blocks, blocks);
         curHamm = -1;
@@ -142,7 +141,7 @@ public class Board {
         for (int i = 0; i < dimension; i++) {
             sb.append(" ");
             for (int j = 0; j < dimension; j++) {
-                sb.append(String.format("%-4d", blocks[i][j]));
+                sb.append(String.format("%-" + printLength + "d", blocks[i][j]));
             }
             sb.append("\n");
         }
@@ -236,24 +235,5 @@ public class Board {
         }
         return zero;
     }
-    public static void main(String[] args) {
-        String dataFile = args[0];
-        dataFile = System.getProperty("user.dir") + "/" + dataFile;
-        System.out.println("file is " + dataFile);
-        In in = new In(dataFile);
-        int N = in.readInt();
-        StdOut.println("Dimension is " + N);
-        int[][] blocks = new int[N][N];
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                blocks[i][j] = in.readInt();
-            }
-        }
-        StdOut.println("blocks Dimension is " + blocks.length);
-        Board initial = new Board(blocks);
-        StdOut.println("hamming is " + initial.hamming());
-        StdOut.println("manhattan is " + initial.manhattan());
-        initial.twin();
-//        initial.isGoal();
-    }
+    
 }
