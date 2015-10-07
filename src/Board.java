@@ -134,18 +134,16 @@ public class Board {
             int j = node % dimension;
             if (i != x && j != y) continue;
             if (i >= 0 && i < dimension && j >= 0 && j < dimension) {
-//                if (node == this.lastZero) continue;
                 int value = blocks[node];
-                int nextMan = curMan - nodeManhattan(node, value) 
+                int nextMan = this.manhattan() - nodeManhattan(node, value) 
                               + nodeManhattan(curZero, value);
-                int nextHamm = curHamm - nodeHamming(node, value) 
+                int nextHamm = this.hamming() - nodeHamming(node, value) 
                                + nodeHamming(curZero, value);
                 Board nextBoard = new Board(this.blocks, this.dimension);
                 nextBoard.curHamm = nextHamm;
                 nextBoard.curMan = nextMan;
                 nextBoard.curZero = node;
                 nextBoard.parent = this;
-//                nextBoard.lastZero = this.curZero;
                 exchangeBlock(curZero, node, nextBoard.blocks);
                 boards.add(nextBoard);
             }
