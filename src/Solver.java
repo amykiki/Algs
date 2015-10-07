@@ -35,9 +35,7 @@ public class Solver {
         }
     }
     private ArrayList<SearchNode> initUsedNodes = new ArrayList<>();
-    private MinPQ<SearchNode> initPQ = new MinPQ<>();
     private ArrayList<SearchNode> twinUsedNodes = new ArrayList<>();
-    private MinPQ<SearchNode> twinPQ = new MinPQ<>();
     
     public Solver(Board aInitial) {
         initial = aInitial;
@@ -46,30 +44,33 @@ public class Solver {
         solveResult = 0;
     }
     public boolean isSolvable() {
-        if (initial.isGoal()) {
-            solveResult = 1;
-            initUsedNodes.add(new SearchNode(initial, initial.manhattan()));
-        }
-        else if (twinInitial.isGoal()) {
-            solveResult = -1;
-        }
-        else {
+        if (solveResult == 0) {
             initUsedNodes.add(new SearchNode(initial, initial.manhattan()));
             twinUsedNodes.add(new SearchNode(twinInitial, twinInitial.manhattan()));
-            Board board = initial;
-            Board board2 = twinInitial;
-            do {
-                SearchNode node = goNext(board, initUsedNodes, initPQ);
-                board  = node.board;
-                curMove = node.move;
-                board2 = goNext(board2, twinUsedNodes, twinPQ).board;
-            } while (!board.isGoal() && !board2.isGoal());
-            
-            if (board.isGoal()) {
+            if (initial.isGoal()) {
                 solveResult = 1;
             }
-            else {
+            else if (twinInitial.isGoal()) {
                 solveResult = -1;
+            }
+            else {
+                MinPQ<SearchNode> initPQ = new MinPQ<>();
+                MinPQ<SearchNode> twinPQ = new MinPQ<>();
+                Board board = initial;
+                Board board2 = twinInitial;
+                do {
+                    SearchNode node = goNext(board, initUsedNodes, initPQ);
+                    board  = node.board;
+                    curMove = node.move;
+                    board2 = goNext(board2, twinUsedNodes, twinPQ).board;
+                } while (!board.isGoal() && !board2.isGoal());
+                
+                if (board.isGoal()) {
+                    solveResult = 1;
+                }
+                else {
+                    solveResult = -1;
+                }
             }
         }
         if (solveResult == 1) return true;
@@ -99,10 +100,7 @@ public class Solver {
         return -1;
     }
     public Iterable<Board> solution() {
-        if (solveResult == 0) {
-            isSolvable();
-        }
-        if (solveResult == 1) {
+        if (isSolvable()) {
             LinkedList<Board> solutions = new LinkedList<>();
             int i = initUsedNodes.size() - 1;
             while (i >= 0) {
