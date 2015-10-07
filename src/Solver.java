@@ -15,16 +15,14 @@ public class Solver {
         private int parent;
         private int priority;
         private int move;
-        
-        public SearchNode(Board aBoard, int aPriority, int aParent, int aMove) {
+        private int num;
+        public SearchNode(Board aBoard, int aNum, int aPriority, int aParent, int aMove) {
             board = aBoard;
+            num = aNum;
             priority = aPriority;
             parent = aParent;
             move = aMove;
 
-        }
-        public SearchNode(Board aBoard, int aPriority) {
-            this(aBoard, aPriority, -1, 0);
         }
         public int compareTo(SearchNode otherNode) {
             if (this.priority > otherNode.priority) return +1;
@@ -34,50 +32,41 @@ public class Solver {
             return 0;
         }
     }
-    private ArrayList<SearchNode> initUsedNodes = new ArrayList<>();
-    private ArrayList<SearchNode> twinUsedNodes = new ArrayList<>();
-    
+    private ArrayList<SearchNode> usedNodes = new ArrayList<>();
     public Solver(Board aInitial) {
         initial = aInitial;
         twinInitial = initial.twin();
         curMove = 0;
         solveResult = 0;
     }
+
     public boolean isSolvable() {
         if (solveResult == 0) {
-            initUsedNodes.add(new SearchNode(initial, initial.manhattan()));
-            twinUsedNodes.add(new SearchNode(twinInitial, twinInitial.manhattan()));
-            if (initial.isGoal()) {
-                solveResult = 1;
+            MinPQ<SearchNode> solvePQ = new MinPQ<>();
+            SearchNode node1 = new SearchNode(initial, 1, initial.manhattan(), -1, 0);
+            SearchNode node2 = new SearchNode(twinInitial, 2, twinInitial.manhattan(), -1, 0);
+            solvePQ.insert(node1);
+            solvePQ.insert(node2);
+            SearchNode node = solvePQ.delMin();
+            
+            while (!node.board.isGoal()) {
+                usedNodes.add(node);
+                addPQ(node.board, solvePQ);
+                node = solvePQ.delMin();
             }
-            else if (twinInitial.isGoal()) {
-                solveResult = -1;
+            if (node.num == 1) {
+                solveResult = 1;
+                usedNodes.add(node);
+                this.curMove = node.move;
             }
             else {
-                MinPQ<SearchNode> initPQ = new MinPQ<>();
-                MinPQ<SearchNode> twinPQ = new MinPQ<>();
-                Board board = initial;
-                Board board2 = twinInitial;
-                do {
-                    SearchNode node = goNext(board, initUsedNodes, initPQ);
-                    board  = node.board;
-                    curMove = node.move;
-                    board2 = goNext(board2, twinUsedNodes, twinPQ).board;
-                } while (!board.isGoal() && !board2.isGoal());
-                
-                if (board.isGoal()) {
-                    solveResult = 1;
-                }
-                else {
-                    solveResult = -1;
-                }
+                solveResult = -1;
             }
         }
         if (solveResult == 1) return true;
         return false;
     }
-    private SearchNode goNext(Board board, ArrayList<SearchNode> usedNodes, 
-                              MinPQ<SearchNode> pq) {
+    private void addPQ(Board board, MinPQ<SearchNode> pq) {
         Iterable<Board> neighbors = board.neighbors();
         int parent = usedNodes.size() - 1;
         SearchNode pNode = usedNodes.get(parent);
@@ -88,12 +77,9 @@ public class Solver {
             if (pParent != -1 && neighborBoard.equals(usedNodes.get(pParent).board))
                 continue;
             int priority = neighborBoard.manhattan() + move;
-            SearchNode node = new SearchNode(neighborBoard, priority, parent, move);
+            SearchNode node = new SearchNode(neighborBoard, pNode.num, priority, parent, move);
             pq.insert(node);
         }
-        SearchNode nextNode = pq.delMin();
-        usedNodes.add(nextNode);
-        return nextNode;
     }
     public int moves() {
         if (isSolvable()) return curMove;
@@ -102,10 +88,10 @@ public class Solver {
     public Iterable<Board> solution() {
         if (isSolvable()) {
             LinkedList<Board> solutions = new LinkedList<>();
-            int i = initUsedNodes.size() - 1;
+            int i = usedNodes.size() - 1;
             while (i >= 0) {
-                solutions.addFirst(initUsedNodes.get(i).board);
-                i = initUsedNodes.get(i).parent;
+                solutions.addFirst(usedNodes.get(i).board);
+                i = usedNodes.get(i).parent;
             }
             return solutions;
         }
