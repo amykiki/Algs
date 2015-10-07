@@ -48,6 +48,7 @@ public class Solver {
     public boolean isSolvable() {
         if (initial.isGoal()) {
             solveResult = 1;
+            initUsedNodes.add(new SearchNode(initial, initial.manhattan()));
         }
         else if (twinInitial.isGoal()) {
             solveResult = -1;
