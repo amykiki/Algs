@@ -9,6 +9,7 @@ public class Solver {
     private Board initial;
     private Board twinInitial;
     private int curMove;
+    private int solveResult;
     private class SearchNode implements Comparable<SearchNode> {
         private Board board;
         private int parent;
@@ -26,9 +27,11 @@ public class Solver {
             this(aBoard, aPriority, -1, 0);
         }
         public int compareTo(SearchNode otherNode) {
-            if (this.priority == otherNode.priority) return 0;
             if (this.priority > otherNode.priority) return +1;
-            return -1;
+            if (this.priority < otherNode.priority) return -1;
+            if (this.board.manhattan() < otherNode.board.manhattan()) return -1;
+            if (this.board.manhattan() > otherNode.board.manhattan()) return +1;
+            return 0;
         }
     }
     private ArrayList<SearchNode> initUsedNodes = new ArrayList<>();
@@ -40,31 +43,48 @@ public class Solver {
         initial = aInitial;
         twinInitial = initial.twin();
         curMove = 0;
+        solveResult = 0;
     }
     public boolean isSolvable() {
-        if (initial.isGoal()) return true;
-        if (twinInitial.isGoal()) return false;
-        initUsedNodes.add(new SearchNode(initial, initial.manhattan()));
-        twinUsedNodes.add(new SearchNode(twinInitial, twinInitial.manhattan()));
-        Board board = initial;
-        Board board2 = twinInitial;
-        do {
-            SearchNode node = goNext(board, initUsedNodes, initPQ);
-            board  = node.board;
-            curMove = node.move;
-            board2 = goNext(board2, twinUsedNodes, twinPQ).board;
-        } while (!board.isGoal() && !board2.isGoal());
-        
-        if (board.isGoal()) return true;
+        if (initial.isGoal()) {
+            solveResult = 1;
+        }
+        else if (twinInitial.isGoal()) {
+            solveResult = -1;
+        }
+        else {
+            initUsedNodes.add(new SearchNode(initial, initial.manhattan()));
+            twinUsedNodes.add(new SearchNode(twinInitial, twinInitial.manhattan()));
+            Board board = initial;
+            Board board2 = twinInitial;
+            do {
+                SearchNode node = goNext(board, initUsedNodes, initPQ);
+                board  = node.board;
+                curMove = node.move;
+                board2 = goNext(board2, twinUsedNodes, twinPQ).board;
+            } while (!board.isGoal() && !board2.isGoal());
+            
+            if (board.isGoal()) {
+                solveResult = 1;
+            }
+            else {
+                solveResult = -1;
+            }
+        }
+        if (solveResult == 1) return true;
         return false;
     }
     private SearchNode goNext(Board board, ArrayList<SearchNode> usedNodes, 
                               MinPQ<SearchNode> pq) {
         Iterable<Board> neighbors = board.neighbors();
         int parent = usedNodes.size() - 1;
-        int move = usedNodes.get(parent).move;
+        SearchNode pNode = usedNodes.get(parent);
+        int move = pNode.move;
+        int pParent = pNode.parent;
         move++;
         for (Board neighborBoard : neighbors) {
+            if (pParent != -1 && neighborBoard.equals(usedNodes.get(pParent).board))
+                continue;
             int priority = neighborBoard.manhattan() + move;
             SearchNode node = new SearchNode(neighborBoard, priority, parent, move);
             pq.insert(node);
@@ -78,14 +98,19 @@ public class Solver {
         return -1;
     }
     public Iterable<Board> solution() {
-        LinkedList<Board> solutions = new LinkedList<>();
-        int i = initUsedNodes.size() - 1;
-        while (i >= 0) {
-            solutions.addFirst(initUsedNodes.get(i).board);
-            i = initUsedNodes.get(i).parent;
+        if (solveResult == 0) {
+            isSolvable();
         }
-        curMove = solutions.size();
-        return solutions;
+        if (solveResult == 1) {
+            LinkedList<Board> solutions = new LinkedList<>();
+            int i = initUsedNodes.size() - 1;
+            while (i >= 0) {
+                solutions.addFirst(initUsedNodes.get(i).board);
+                i = initUsedNodes.get(i).parent;
+            }
+            return solutions;
+        }
+        return null;
     }
     public static void main(String[] args) {
         In in = new In(args[0]);
@@ -97,7 +122,6 @@ public class Solver {
             }
         }
         Board initial = new Board(blocks);
-        StdOut.println(initial.toString());
         Solver solver = new Solver(initial);
         if (!solver.isSolvable())
             StdOut.println("No solution possible");

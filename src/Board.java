@@ -8,8 +8,9 @@ public class Board {
     private int curHamm;
     private int curMan;
     private int curZero;
-    private int lastZero;
+//    private int lastZero;
     private int printLength;
+    private Board parent;
     public Board(int[][] blocks) {
         int N = blocks.length;
         dimension = N;
@@ -20,7 +21,7 @@ public class Board {
         curHamm = -1;
         curMan = -1;
         curZero = -1;
-        lastZero = -1;
+        parent = null;
     }
     private Board(int[] blocks, int dimension) {
         this.dimension = dimension;
@@ -31,7 +32,7 @@ public class Board {
         curHamm = -1;
         curMan = -1;
         curZero = -1;
-        lastZero = -1;
+        parent = null;
     }
     public boolean equals(Object y) {
         if (y == null) return false;
@@ -39,6 +40,11 @@ public class Board {
         if (this.getClass() != y.getClass()) return false;
         Board other = (Board) y;
         if (this.dimension != other.dimension) return false;
+        if (this.lookZero() != other.lookZero()) return false;
+        if (this.parent != null && this.parent.parent == other) return true;
+        if (other.parent != null && other.parent.parent == this) return true;
+        if (this.hamming() != other.hamming()) return false;
+        if (this.manhattan() != other.manhattan()) return false;
         boolean result = true;
         for (int i = 0; i < blockLength; i++) {
             if (this.blocks[i] != other.blocks[i]) {
@@ -128,7 +134,7 @@ public class Board {
             int j = node % dimension;
             if (i != x && j != y) continue;
             if (i >= 0 && i < dimension && j >= 0 && j < dimension) {
-                if (node == this.lastZero) continue;
+//                if (node == this.lastZero) continue;
                 int value = blocks[node];
                 int nextMan = curMan - nodeManhattan(node, value) 
                               + nodeManhattan(curZero, value);
@@ -138,7 +144,8 @@ public class Board {
                 nextBoard.curHamm = nextHamm;
                 nextBoard.curMan = nextMan;
                 nextBoard.curZero = node;
-                nextBoard.lastZero = this.curZero;
+                nextBoard.parent = this;
+//                nextBoard.lastZero = this.curZero;
                 exchangeBlock(curZero, node, nextBoard.blocks);
                 boards.add(nextBoard);
             }
@@ -188,14 +195,15 @@ public class Board {
         }
     }
     private int lookZero() {
-        int zero = -1;
-        for (int i = 0; i < blockLength; i++) {
-            if (blocks[i] == 0) {
-                zero = i;
-                break;
+        if (this.curZero == -1) {
+            for (int i = 0; i < blockLength; i++) {
+                if (blocks[i] == 0) {
+                    this.curZero = i;
+                    break;
+                }
             }
         }
-        return zero;
+        return this.curZero;
     }
     
 }
