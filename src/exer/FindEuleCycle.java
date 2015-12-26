@@ -90,10 +90,11 @@ public class FindEuleCycle {
         return vers.iterator();
     }
     public static void main(String[] args) {
-        In in = new In(args[0]);
-//        In in = new In("D:\\GIT\\Algs\\data\\eulecycle1.txt");
+//        In in = new In(args[0]);
+        In in = new In("D:\\WorkSpace\\Algs\\data\\eulecycle1.txt");
         Graph G  = new Graph(in);
-        FindEuleCycle fec = new FindEuleCycle(G, Integer.parseInt(args[1]));
+//        FindEuleCycle fec = new FindEuleCycle(G, Integer.parseInt(args[1]));
+        FindEuleCycle fec = new FindEuleCycle(G, 0);
         if (fec.isEuleCycle()) {
             Iterator<Integer> path = fec.path();
             while(path.hasNext()) {
